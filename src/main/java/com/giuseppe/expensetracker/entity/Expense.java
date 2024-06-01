@@ -20,11 +20,9 @@ public class Expense {
     @ManyToOne
     @JoinColumn(name = "category")
     private Category category;
-
     @ManyToOne
     @JoinColumn(name = "user")
     private User user;
-
     @Column(name = "store")
     private String store;
 

@@ -18,19 +18,28 @@ public class ExpenseController {
     private ExpenseService expenseService;
 
     @GetMapping
-    public List<Expense> getAllExpenses(){
-        return expenseService.getAllExpenses();
+    public ResponseEntity<List<Expense>> getAllExpenses(){
+        return ResponseEntity.ok(expenseService.getAllExpenses());
     }
 
     @GetMapping("/user/{userId}")
-    public List<Expense> getAllExpenses(@PathVariable Long userId){
-        return expenseService.getAllExpensesByUserId(userId);
+    public ResponseEntity<List<Expense>> getAllExpenses(@PathVariable Long userId){
+        return ResponseEntity.ok(expenseService.getAllExpensesByUserId(userId));
     }
 
     @PostMapping
     public ResponseEntity<Expense> saveExpense(@Valid @RequestBody ExpenseDTO expenseDTO){
         Expense expense = expenseService.saveExpense(expenseDTO);
         return ResponseEntity.ok(expense);
+    }
 
+    @PutMapping("/{expenseId}")
+    public ResponseEntity<Expense> updateExpense(@PathVariable Long expenseId, @RequestBody ExpenseDTO expenseDTO){
+        Expense expense = expenseService.updateExpense(expenseId,expenseDTO);
+        return ResponseEntity.ok(expense);
+    }
+    @DeleteMapping("/{expenseId}")
+    public void deleteExpense(@PathVariable Long expenseId){
+        expenseService.deleteExpense(expenseId);
     }
 }

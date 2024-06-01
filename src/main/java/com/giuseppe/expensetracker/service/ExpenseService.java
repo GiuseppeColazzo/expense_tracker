@@ -4,6 +4,7 @@ import com.giuseppe.expensetracker.dto.ExpenseDTO;
 import com.giuseppe.expensetracker.entity.Category;
 import com.giuseppe.expensetracker.entity.Expense;
 import com.giuseppe.expensetracker.entity.User;
+import com.giuseppe.expensetracker.mapper.Mapper;
 import com.giuseppe.expensetracker.repository.CategoryRepository;
 import com.giuseppe.expensetracker.repository.ExpenseRepository;
 import com.giuseppe.expensetracker.repository.UserRepository;
@@ -25,6 +26,9 @@ public class ExpenseService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private Mapper mapper;
+
     public List<Expense> getAllExpenses(){
         return  expenseRepository.findAll();
     }
@@ -39,15 +43,25 @@ public class ExpenseService {
         User user = userRepository.findById(expenseDTO.getUserId()).orElseThrow(()-> new RuntimeException("User not found"));
         Category category = categoryRepository.findById(expenseDTO.getCategoryId()).orElseThrow(()-> new RuntimeException("Category not found"));
 
-        Expense expense = new Expense();
-        expense.setAmount(expenseDTO.getAmount());
-        expense.setPurchase_date(expenseDTO.getPurchaseDate());
-        expense.setCategory(category);
-        expense.setUser(user);
-        expense.setStore(expenseDTO.getStore());
-        expense.setNotes(expenseDTO.getNotes());
+        Expense expense = mapper.map(expenseDTO,category,user);
 
         return expenseRepository.save(expense);
+    }
 
+    @Transactional
+    public Expense updateExpense(Long expenseId,ExpenseDTO expenseDTO){
+
+
+        Expense existingExpense = expenseRepository.findById(expenseId).orElseThrow(()->new RuntimeException("Expense not found"));
+        User user = userRepository.findById(expenseDTO.getUserId()).orElseThrow(()-> new RuntimeException("User not found"));
+        Category category = categoryRepository.findById(expenseDTO.getCategoryId()).orElseThrow(()-> new RuntimeException("Category not found"));
+
+        return expenseRepository.save(mapper.map(existingExpense, expenseDTO,category,user));
+
+    }
+
+    @Transactional
+    public void deleteExpense(Long expenseId){
+        expenseRepository.deleteById(expenseId);
     }
 }
